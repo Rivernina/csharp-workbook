@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Checkers
+namespace csharp_workbook
 {
     class Program
     {
