@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HelloWorld
+namespace csharp_workbook
 {
     class Program
     {
