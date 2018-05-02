@@ -36,6 +36,11 @@ namespace RockPaperScissors
           Console.WriteLine(CompareHands(hand1, hand2));
           Console.WriteLine("Hand 1 has {0} points and Hand 2 has {1} points\n", hand1Score, hand2Score);
         }
+
+        if(hand1Score == 5 || hand2Score == 5)
+			{
+				Console.WriteLine("\n\t*****Thank you for playing with me!*****\n".ToUpper());
+			}
         
       }
 
@@ -53,10 +58,10 @@ namespace RockPaperScissors
             if (hand2 == "paper")
           {
             hand2Score++;
-            return "\tHand 2 Wins!\n";
+            return "\tHand 2 Wins!\n".ToUpper();
         }
           hand1Score++;
-          return "\tHand 1 Wins!\n";
+          return "\tHand 1 Wins!\n".ToUpper();
         }
       
         if (hand1 == "scissors")
@@ -64,10 +69,10 @@ namespace RockPaperScissors
           if (hand2 == "paper")
           {
             hand1Score++;
-            return "\tHand 1 Wins!\n";
+            return "\tHand 1 Wins!\n".ToUpper();
           }
           hand2Score++;
-          return "\tHand  2 Wins!\n";
+          return "\tHand  2 Wins!\n".ToUpper();
         }
       
         if (hand1 == "paper")
@@ -75,13 +80,13 @@ namespace RockPaperScissors
           if (hand2 == "scissors")
           {
             hand2Score++;
-            return "\tHand 2 Wins!\n";
+            return "\tHand 2 Wins!\n".ToUpper();
           }
           hand1Score++;
-          return "\tHand  1 Wins!\n";
+          return "\tHand  1 Wins!\n".ToUpper();
         }
       
-        return "\tNot valid hand!\n";	
+        return "\tNot valid hand! Please try again.\n";	
       }
       
   }
