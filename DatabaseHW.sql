@@ -1,3 +1,20 @@
+-- Project
+-- Build a database.
+-- Your database must have the following:
+
+-- 10 Toys
+-- Price
+-- ID
+-- Quantity in Stock
+-- Experiment with deleting and adding products.
+-- Add another table aisles with an id, name
+-- Add an aisle_id foreign key on the toys table and assign an aisle to teach toy.
+--
+-- My Project here:
+--  http://rextester.com/CSE28640
+
+
+
 CREATE TABLE toys (id INT, toy VARCHAR(50), 
              manufacturer VARCHAR(50), country VARCHAR(10), model VARCHAR(10), price FLOAT, stock INT);
       
