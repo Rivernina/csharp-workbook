@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.Linq;
 
-namespace Database{
+namespace Database
+{
     class Program
     {
         static SqliteConnectionStringBuilder connectionStringBuilder = new SqliteConnectionStringBuilder();
@@ -13,7 +14,10 @@ namespace Database{
         {
             connectionStringBuilder.DataSource = "./database.db";
             SqliteDataReader reader = RunQuery(@"
-                SELECT * FROM items;
+                SELECT items.name, warehouses.location
+                FROM items
+                JOIN containers ON items.container_id = containers.id
+                JOIN warehouses ON containers.warehouse_id = warehouses.id;
             ");
             PrintResults(reader);
         }
