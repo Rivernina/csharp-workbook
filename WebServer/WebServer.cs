@@ -11,22 +11,153 @@ namespace WebServer
     class Program
     {
         static SqliteConnectionStringBuilder connectionStringBuilder = new SqliteConnectionStringBuilder();
+        static string style = @"     
+            <style>
+                .items 
+                {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .item 
+                {
+                    min-width: 200px;
+                    padding: 10px;
+                    background-color: DarkSlateGray;
+                    color: Gainsboro;
+                    margin: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 400;
+                }
+
+                .containers 
+                {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .container 
+                {
+                    min-width: 200px;
+                    padding: 10px;
+                    background-color: DarkSlateGray;
+                    color: Gainsboro;
+                    margin: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 400;
+                }
+
+
+                .warehouses
+                {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .warehouse 
+                {
+                    min-width: 200px;
+                    padding: 10px;
+                    background-color: DarkSlateGray;
+                    color: Gainsboro;
+                    margin: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 400;
+                }
+
+
+                .companies
+                {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .company 
+                {
+                    min-width: 200px;
+                    padding: 10px;
+                    background-color: DarkSlateGray;
+                    color: Gainsboro;
+                    margin: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 400;
+                }
+            </style>
+        ";
         
+
         static void Main()
         {
             connectionStringBuilder.DataSource = "./database.db";
 
-            Route.Add("/items", (request, response, args) => {
-                response.AsText(getItems());
-            });
+            Route.Add("/", (request, response, args) => {
+                response.AsText("Hello, World!");
+            }, "GET");
+
+//**********************************
 
             Route.Add("/items", (request, response, args) => {
+                response.AsText($"{style}{getItems()}");
+            }, "GET");
+
+            Route.Add("/items", (request, response, args) => {
+                request.ParseBody(args);
                 RunQuery($@"
                     INSERT into items (name, price, container_id)
-                    VALUES ('milk', '2.99', 1);
+                    VALUES ('{args["name"]}', '{args["price"]}', {args["container_id"]});
                 ");
-                response.AsText(getItems());
+                response.AsText($"{style}{getItems()}");
             }, "POST");
+
+//**********************************
+            
+            Route.Add("/containers", (request, response, args) => {
+                response.AsText($"{style}{getContainers()}");
+            }, "GET");
+
+            Route.Add("/containers", (request, response, args) => {
+                request.ParseBody(args);
+                RunQuery($@"
+                    INSERT into containers (name, warehouse_id)
+                    VALUES ('{args["name"]}', {args["warehouse_id"]});
+                ");
+                response.AsText($"{style}{getContainers()}");
+            }, "POST");
+
+
+// //**********************************
+
+            Route.Add("/warehouses", (request, response, args) => {
+                response.AsText($"{style}{getWarehouses()}");
+            }, "GET");
+
+            Route.Add("/warehouses", (request, response, args) => {
+                request.ParseBody(args);
+                RunQuery($@"
+                    INSERT into warehouses (company_id, location)
+                    VALUES ({args["company_id"]}, '{args["location"]}');
+                ");
+                response.AsText($"{style}{getWarehouses()}");
+            }, "POST");
+
+
+// //**********************************
+
+            Route.Add("/companies", (request, response, args) => {
+                response.AsText($"{style}{getCompanies()}");
+            }, "GET");
+
+            Route.Add("/companies", (request, response, args) => {
+                request.ParseBody(args);
+                RunQuery($@"
+                    INSERT into companies (name)
+                    VALUES ('{args["name"]}');
+                ");
+                response.AsText($"{style}{getCompanies()}");
+            }, "POST");
+
+
+
 
             //run the server
             int port = 8000;
@@ -34,35 +165,133 @@ namespace WebServer
             HttpServer.ListenAsync(port, CancellationToken.None, Route.OnHttpRequestAsync).Wait();
         }
 
+
         static string getItems()
         {
-            List<Dictionary<string, string>> results = RunQuery(@"
+            var results = RunQuery($@"  
                 SELECT *
                 FROM items;
             ");
-            string stringResults = PrintResults(results);
-            stringResults += @"
-                <br /><br />
-                <form action='/items' method='POST'>
-                    <label> Name
-                        <input name='name' />
+            string html = $@"
+                <div class='items'>
+                    <div class='item'>{String.Join("</div><br /><div class='item'>", PrintResults(results).Split('\n'))}</div>
+                </div>
+            ";
+            html += @"
+                <br/><br/>
+                <form method='POST' action='/items'>
+                    <label>Name
+                    <input name='name' />
                     </label>
-                    <label> Price ($)
-                        <input name='price' />
+                    <label>Price
+                    <input name='price' />
                     </label>
-                    <label> Price ($)
-                        <select name='container_id'>
-                            <option value='1'>Austin-1</option>
-                            <option value='2'>San Antonio-1</option>
-                            <option value='3'>Houston-1</option>
-                            <option value='4'>Dallas-1</option>
-                        </select>
+                    <label>Container
+                    <select name='container_id'>
+                        <option value='1'>Austin-1</option>
+                        <option value='2'>San Antonio-1</option>
+                        <option value='3'>Houston-1</option>
+                        <option value='4'>Dallas-1</option>
+                    </select>
                     </label>
-                    <input type='Submit' value='Submit' />
+                    <input type='submit' value='Submit' />
                 </form>
             ";
-            return stringResults;
+            return html;
         }
+
+
+
+        static string getContainers()
+        {
+            var results = RunQuery($@"  
+                SELECT *
+                FROM containers;
+            ");
+            string html = $@"
+                <div class='containers'>
+                    <div class='container'>{String.Join("</div><br /><div class='container'>", PrintResults(results).Split('\n'))}</div>
+                </div>
+            ";
+            html += @"
+                <br/><br/>
+                <form method='POST' action='/containers'>
+                    <label>Name
+                    <input name='name' />
+                    </label>
+                    <label>Warehouse
+                    <select name='warehouse_id'>
+                        <option value='1'>Austin</option>
+                        <option value='2'>San Antonio</option>
+                        <option value='3'>Houston</option>
+                        <option value='4'>Dallas</option>
+                    </select>
+                    </label>
+                    <input type='submit' value='Submit' />
+                </form>
+            ";
+            return html;
+        }
+
+
+
+        static string getWarehouses()
+        {
+            var results = RunQuery($@"  
+                SELECT *
+                FROM warehouses;
+            ");
+            string html = $@"
+                <div class='warehouses'>
+                    <div class='warehouse'>{String.Join("</div><br /><div class='warehouse'>", PrintResults(results).Split('\n'))}</div>
+                </div>
+            ";
+            html += @"
+                <br/><br/>
+                <form method='POST' action='/warehouses'>
+                <label>Company_ID
+                    <select name='company_id'>
+                        <option value='1'>Austin</option>
+                        <option value='2'>San Antonio</option>
+                        <option value='3'>Houston</option>
+                        <option value='4'>Dallas</option>
+                    </select>
+                    </label>
+                    <label>Location
+                    <input name='location' />
+                    </label>
+                    <input type='submit' value='Submit' />
+                </form>
+            ";
+            return html;
+        }
+
+
+
+        static string getCompanies()
+        {
+            var results = RunQuery($@"  
+                SELECT *
+                FROM companies;
+            ");
+            string html = $@"
+                <div class='companies'>
+                    <div class='company'>{String.Join("</div><br /><div class='company'>", PrintResults(results).Split('\n'))}</div>
+                </div>
+            ";
+            html += @"
+                <br/><br/>
+                <form method='POST' action='/companies'>
+                    <label>Name
+                    <input name='name' />
+                    </label>
+                    <input type='submit' value='Submit' />
+                </form>
+            ";
+            return html;
+        }
+
+
 
         static List<Dictionary<string, string>> RunQuery(string query)
         {
@@ -100,7 +329,7 @@ namespace WebServer
             foreach (var result in results)
             {
                 System.Collections.Generic.IEnumerable<string> lines = result.Select(kvp => kvp.Key + ": " + kvp.Value);
-                resultsString += String.Join(Environment.NewLine, lines);
+                resultsString += $"{String.Join("<br/>", lines)}\n";
             }
             return resultsString;
         }
